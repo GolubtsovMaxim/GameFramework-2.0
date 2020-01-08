@@ -14,6 +14,7 @@ public:
 	//bool initOpenGL(GLFWwindow* inWindow);
 
 	WindowHandle* pWindowHandle;
+	GLFWwindow* pWindow = NULL;
 private:
 	void Render(GLFWwindow* pInWindow);
 };

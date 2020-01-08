@@ -14,39 +14,48 @@ Application::~Application()
 /////////////*****************/////////////////
 int Application::Run()
 {
-	if (!glfwInit())
+	double lastTime = glfwGetTime();
+	while (!glfwWindowShouldClose(pWindow))
 	{
-		return false;
-	}
-	
-	pWindowHandle = new WindowHandle();
+		double currentTime = glfwGetTime();
+		double deltaTime = currentTime - lastTime;
 
-	pWindowHandle->getVerticesArr(); //previously
+		if (!glfwInit())
+		{
+			return false;
+		}
 
-	SetGLFWwindowHint(3, 3);
+		pWindowHandle = new WindowHandle();
+		GLFWwindow* pWindow = glfwCreateWindow(pWindowHandle->mWindowWidth, pWindowHandle->mWindowHeight, pWindowHandle->getGameWindowTitle(), nullptr, nullptr);
 
-	GLFWwindow* pWindow = glfwCreateWindow(pWindowHandle->mWindowWidth, pWindowHandle->mWindowHeight, pWindowHandle->getGameWindowTitle(), nullptr, nullptr);
-	if (pWindow == nullptr)
-	{
+		pWindowHandle->getVerticesArr(); //previously
+
+		SetGLFWwindowHint(3, 3);
+		
+		if (pWindow == nullptr)
+		{
+			glfwTerminate();
+			return false;
+		}
+
+		glfwMakeContextCurrent(pWindow);
+
+		glewExperimental = GL_TRUE;
+		if (glewInit() != GLEW_OK)
+		{
+			return false;
+		}
+
+		glfwSetKeyCallback(pWindow, WindowHandle::glfw_onKey);
+
+		Render(pWindow);
+
 		glfwTerminate();
-		return false;
+
+		return 0;
 	}
 
-	glfwMakeContextCurrent(pWindow);
-
-	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_OK)
-	{
-		return false;
-	}
-
-	glfwSetKeyCallback(pWindow, WindowHandle::glfw_onKey);
-
-	Render(pWindow);
-
-	glfwTerminate();
-
-	return 0;
+	return 1;
 }
 /////////////*****************/////////////////
 
