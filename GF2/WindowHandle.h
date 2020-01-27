@@ -8,7 +8,7 @@ public:
 
 	const char* getGameWindowTitle();
 	static void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
-	std::vector<GLfloat> getVerticesArr() { return mVertices; };
+	std::vector<GLfloat>& getVerticesArr() { return mVertices; };
 	
 	const unsigned mWindowWidth = 800;
 	const unsigned mWindowHeight = 600;
