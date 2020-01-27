@@ -67,6 +67,15 @@ void Application::SetGLFWwindowHint(unsigned major, unsigned minor)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 }
 
+void Application::SetupGPUBuffer(std::vector<GLfloat> vertices)
+{
+	GLuint vbo, vao;
+
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW); //stop here
+}
+
 void Application::Render(GLFWwindow* pInWindow)
 {
 	while (!glfwWindowShouldClose(pInWindow))

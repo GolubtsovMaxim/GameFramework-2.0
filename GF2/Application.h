@@ -1,6 +1,5 @@
 #include <sstream>
 
-
 #include "WindowHandle.h"
 
 class Application
@@ -17,4 +16,5 @@ public:
 	GLFWwindow* pWindow = NULL;
 private:
 	void Render(GLFWwindow* pInWindow);
+	void SetupGPUBuffer(std::vector<GLfloat> vertices);
 };
