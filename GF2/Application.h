@@ -1,6 +1,8 @@
 #include <sstream>
 
 #include "WindowHandle.h"
+#include "Texture.h"
+#include "ShaderProgram.h"
 
 class Application
 {
@@ -14,7 +16,12 @@ public:
 
 	WindowHandle* pWindowHandle;
 	GLFWwindow* pWindow = NULL;
+	Texture* pTexture;
+	ShaderProgram* pShaderProgram;
+
+	GLuint vao, vbo;
+
 private:
-	void Render(GLFWwindow* pInWindow);
+	void Render(GLFWwindow* pInWindow, Texture* pInTexture, glm::vec3 InCubePos, float InCubeAngle, double InDeltaTime);
 	void SetupGPUBuffer(std::vector<GLfloat> vertices);
 };
