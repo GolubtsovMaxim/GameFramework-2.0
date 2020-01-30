@@ -1,18 +1,18 @@
-#include "ShaderProgram.h"
-
-
 #include <fstream>
 #include <sstream>
+#include <iostream>
+
+#include "ShaderProgram.h"
+
 #include "glm/gtc/type_ptr.hpp"
 
-
-ShaderProgram::ShaderProgram() : mHandle(0)
+ShaderProgram::ShaderProgram() : mHandle(0) 
 {
+
 }
 
-
 ShaderProgram::~ShaderProgram()
-{
+{ 
 	glDeleteProgram(mHandle);
 }
 
@@ -25,7 +25,6 @@ bool ShaderProgram::loadShaders(const char* vertexShaderFileName, const char* fr
 	GLuint VertexShader = glCreateShader(GL_VERTEX_SHADER);
 	GLuint FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-
 	glShaderSource(VertexShader, 1, &pVerterShaderSource, NULL);
 	glShaderSource(FragmentShader, 1, &pFragmentShaderSource, NULL);
 
@@ -37,12 +36,17 @@ bool ShaderProgram::loadShaders(const char* vertexShaderFileName, const char* fr
 
 
 	mHandle = glCreateProgram();
+	if (mHandle == 0)
+	{
+		std::cerr << "Unable to create shader program!" << std::endl;
+		return false;
+	}
+
 	glAttachShader(mHandle, VertexShader);
 	glAttachShader(mHandle, FragmentShader);
 
-
 	glLinkProgram(mHandle);
-	checkCompileErrors(mHandle, COMPILED);
+	//checkCompileErrors(mHandle, COMPILED);
 
 	glDeleteShader(VertexShader);
 	glDeleteShader(FragmentShader);
@@ -73,6 +77,8 @@ std::string ShaderProgram::fileToString(const std::string& filename)
 	//read 
 	bufferString << shaderSourceFile.rdbuf();
 
+	shaderSourceFile.close();
+
 	return bufferString.str();
 }
 
@@ -93,7 +99,7 @@ void ShaderProgram::checkCompileErrors(GLuint shader, ShaderType type)
 		glGetProgramiv(shader, GL_COMPILE_STATUS, &status);
 		if (status == GL_FALSE)
 		{
-			//std::cerr << "Shader failed to compilation\n";
+			std::cerr << "Shader failed to compilation\n";
 		}
 	}
 }

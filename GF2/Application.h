@@ -17,11 +17,11 @@ public:
 	WindowHandle* pWindowHandle;
 	GLFWwindow* pWindow = NULL;
 	Texture* pTexture;
-	ShaderProgram* pShaderProgram;
+	//ShaderProgram* pShaderProgram;
 
 	GLuint vao, vbo;
 
 private:
-	void Render(GLFWwindow* pInWindow, Texture* pInTexture, glm::vec3 InCubePos, float InCubeAngle, double InDeltaTime);
+	void Render(GLFWwindow* pInWindow, Texture* pInTexture, glm::vec3 InCubePos, float InCubeAngle, double InDeltaTime, ShaderProgram sp);
 	void SetupGPUBuffer(std::vector<GLfloat> vertices);
 };

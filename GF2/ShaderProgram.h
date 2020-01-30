@@ -1,4 +1,9 @@
-#include "BaseObjectComponent.h"
+#include <map>
+
+#define GLEW_STATIC
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
+#include "glm/glm.hpp"
 
 class ShaderProgram
 {
@@ -33,4 +38,3 @@ private:
 	GLuint mHandle; //actual shader on the GPU
 	std::map<std::string, GLint> mUniformLocations;
 };
-

@@ -2,12 +2,11 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 
-const std::string texture1 = "textures/wooden_crate.jpg";
+const std::string texture1 = "textures/BaseTexture.jpg";
 
 Application::Application()
 {
 }
-
 
 Application::~Application()
 {
@@ -17,7 +16,7 @@ Application::~Application()
 int Application::Run()
 {
 	pWindowHandle = new WindowHandle();
-	pShaderProgram = new ShaderProgram();
+	ShaderProgram* pShaderProgram = new ShaderProgram();
 	pTexture = new Texture();
 	
 	if (!glfwInit())
@@ -48,19 +47,21 @@ int Application::Run()
 
 	glm::vec3 cubePos = glm::vec3(0.0f, 0.0f, -5.0f);
 
+	ShaderProgram sp;
+	sp.loadShaders("shaders/basic.vert", "shaders/basic.frag");
 	pShaderProgram->loadShaders("shaders/basic.vert", "shaders/basic.frag");
 
 	pTexture->loadTexture(texture1, true);
 
 	double lastTime = glfwGetTime();
-	float cubeAngle = 0.0f();
+	float cubeAngle = 0.0f;
 
 	while (!glfwWindowShouldClose(pWindow))
 	{
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - lastTime;
 
-		Render(pWindow, pTexture, cubePos, cubeAngle, deltaTime);
+		Render(pWindow, pTexture, cubePos, cubeAngle, deltaTime, sp);
 		
 		lastTime = currentTime;
 	}
@@ -101,7 +102,7 @@ void Application::SetupGPUBuffer(std::vector<GLfloat> vertices)
 	glBindVertexArray(0);
 }
 
-void Application::Render(GLFWwindow* pInWindow, Texture* pInTexture, glm::vec3 InCubePos, float InCubeAngle, double InDeltaTime)
+void Application::Render(GLFWwindow* pInWindow, Texture* pInTexture, glm::vec3 InCubePos, float InCubeAngle, double InDeltaTime, ShaderProgram sp)
 {
 	while (!glfwWindowShouldClose(pInWindow))
 	{
@@ -127,11 +128,11 @@ void Application::Render(GLFWwindow* pInWindow, Texture* pInTexture, glm::vec3 I
 
 		projection = glm::perspective(glm::radians(45.0f), (float) pWindowHandle->mWindowWidth / (float)pWindowHandle->mWindowHeight, 0.1f, 100.0f);
 
-		pShaderProgram->useShaders();
+		sp.useShaders();
 
-		pShaderProgram->setUniform("model", model);
-		pShaderProgram->setUniform("view", view);
-		pShaderProgram->setUniform("projection", projection);
+		sp.setUniform("model", model);
+		sp.setUniform("view", view);
+		sp.setUniform("projection", projection);
 
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
