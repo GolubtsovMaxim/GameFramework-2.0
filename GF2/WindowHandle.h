@@ -1,7 +1,7 @@
 #include <vector>
 
 #define GLEW_STATIC
-#include "GL/glew.h"
+#include "GL/glew.h"	
 #include "GLFW/glfw3.h"
 
 class WindowHandle
@@ -9,18 +9,18 @@ class WindowHandle
 public:
 	WindowHandle();
 	~WindowHandle();
+	const char* getTitle() { return mAPP_TITLE; };
+	std::vector<GLfloat>& getVertices() { return mVertices; };
 
-	const char* getGameWindowTitle();
+	const unsigned gWindowWidth = 1024;
+	const unsigned gWindowHeight = 768;
+	GLFWwindow* gWindow = NULL;
 	static void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
-	std::vector<GLfloat>& getVerticesArr() { return mVertices; };
-	
-	const unsigned mWindowWidth = 800;
-	const unsigned mWindowHeight = 600;
 
 private:
+	const char* mAPP_TITLE = "The Application";
 	std::vector<GLfloat> mVertices =
 	{
-		// front face
 		-1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
 		 1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
 		 1.0f,  1.0f,  1.0f, 1.0f, 1.0f,
@@ -53,20 +53,20 @@ private:
 		   1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
 
 		   // top face
-		   -1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
-			1.0f,  1.0f,  1.0f, 1.0f, 0.0f,
-			1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
-		   -1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
-		   -1.0f,  1.0f,  1.0f, 0.0f, 0.0f,
-			1.0f,  1.0f,  1.0f, 1.0f, 0.0f,
+		  -1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+		   1.0f,  1.0f,  1.0f, 1.0f, 0.0f,
+		   1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
+		  -1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+		  -1.0f,  1.0f,  1.0f, 0.0f, 0.0f,
+		   1.0f,  1.0f,  1.0f, 1.0f, 0.0f,
 
-			// bottom face
-			-1.0f, -1.0f,  1.0f, 0.0f, 1.0f,
-			 1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
-			 1.0f, -1.0f,  1.0f, 1.0f, 1.0f,
-			-1.0f, -1.0f,  1.0f, 0.0f, 1.0f,
-			-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-			 1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+		   // bottom face
+		  -1.0f, -1.0f,  1.0f, 0.0f, 1.0f,
+		   1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+		   1.0f, -1.0f,  1.0f, 1.0f, 1.0f,
+		  -1.0f, -1.0f,  1.0f, 0.0f, 1.0f,
+		  -1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+		   1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
 	};
-
 };
+

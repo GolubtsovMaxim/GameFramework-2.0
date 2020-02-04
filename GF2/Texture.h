@@ -13,9 +13,8 @@ public:
 	void bind(GLuint texUnit = 0);
 
 private:
-	Texture(const Texture& tex) {}
-	Texture& operator = (const Texture& tex) {}
+	Texture(const Texture& txtr) {}
+	Texture& operator = (const Texture& txtr) {}
 
 	GLuint mTexture;
 };
-

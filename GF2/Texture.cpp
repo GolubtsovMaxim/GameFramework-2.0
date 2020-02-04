@@ -1,6 +1,7 @@
-#include "Texture2D.h"
+#include "Texture.h"
 #include <iostream>
 #include <cassert>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
 
@@ -48,7 +49,7 @@ bool Texture::loadTexture(const std::string& fileName, bool generateMipMaps)
 	}
 
 	glGenTextures(1, &mTexture);
-	glBindTexture(GL_TEXTURE_2D, mTexture); 
+	glBindTexture(GL_TEXTURE_2D, mTexture);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -66,9 +67,6 @@ bool Texture::loadTexture(const std::string& fileName, bool generateMipMaps)
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// Bind the texture unit passed in as the active texture in the shader
-//-----------------------------------------------------------------------------
 void Texture::bind(GLuint texUnit)
 {
 	assert(texUnit >= 0 && texUnit < 32);
