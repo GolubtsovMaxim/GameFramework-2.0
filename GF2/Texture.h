@@ -7,13 +7,14 @@ class Texture
 {
 public:
 	Texture();
+	Texture(const Texture& txtr) {}
 	virtual ~Texture();
 
 	bool loadTexture(const std::string& fileName, bool generateMipMaps = true);
 	void bind(GLuint texUnit = 0);
 
 private:
-	Texture(const Texture& txtr) {}
+	
 	Texture& operator = (const Texture& txtr) {}
 
 	GLuint mTexture;

@@ -24,8 +24,11 @@ Application::~Application()
 
 int Application::Run()
 {
-	WindowHandle* wndhdl = new WindowHandle;
-	if (!initOpenGL(wndhdl))
+	WindowHandle* pWndhdl = new WindowHandle;
+	Texture* pTexture = new Texture;
+	ShaderProgram* pShader = new ShaderProgram;
+
+	if (!initOpenGL(pWndhdl))
 	{
 		std::cerr << "GLFW initialization failed" << std::endl;
 		return -1;
@@ -33,87 +36,28 @@ int Application::Run()
 
 	glm::vec3 cubePos = glm::vec3(0.0f, 0.0f, -5.0f);
 	
-	SetupGPUBuffer(wndhdl->getVertices());
+	SetupGPUBuffer(pWndhdl->getVertices());
 
-	ShaderProgram shaderProgram;
-	shaderProgram.loadShaders("shaders/basic.vert", "shaders/basic.frag");
-
-	Texture texture;
-	texture.loadTexture(texture1, true);
+	pShader->loadShaders("shaders/basic.vert", "shaders/basic.frag");
+	pTexture->loadTexture(texture1, true);
 
 	double lastTime = glfwGetTime();
 	float cubeAngle = 0.0f;
 
 	// Rendering loop
-	while (!glfwWindowShouldClose(wndhdl->gWindow))
+	while (!glfwWindowShouldClose(pWndhdl->gWindow))
 	{
-		showFPS(wndhdl->gWindow, *wndhdl);
-
-		double currentTime = glfwGetTime();
-		double deltaTime = currentTime - lastTime;
-
-		// Poll for and process events
-		glfwPollEvents();
-
-		// Clear the screen
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		texture.bind(0);
-
-		glm::mat4 model(1.0), view(1.0), projection(1.0);
-
-		cubeAngle += (float)(deltaTime * 50.0f);
-		if (cubeAngle >= 360.0f) cubeAngle = 0.0f;
-
-		model = glm::translate(model, cubePos) * glm::rotate(model, glm::radians(cubeAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-
-		glm::vec3 camPos(0.0f, 0.0f, 0.0f);
-		glm::vec3 targetPos(0.0f, 0.0f, -1.0f);
-		glm::vec3 up(0.0f, 1.0f, 0.0f);
-
-		view = glm::lookAt(camPos, camPos + targetPos, up);
-
-		projection = glm::perspective(glm::radians(45.0f), (float)wndhdl->gWindowWidth / (float)wndhdl->gWindowHeight, 0.1f, 100.0f);
-
-		shaderProgram.use();
-
-		// Pass the matrices to the shader
-		shaderProgram.setUniform("model", model);
-		shaderProgram.setUniform("view", view);
-		shaderProgram.setUniform("projection", projection);
-
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-		//////////////////////////////////////////////////////////////////////////////////
-		texture.bind(0);
-
-		cubeAngle += (float)(deltaTime * 50.0f);
-		if (cubeAngle >= 360.0f) cubeAngle = 0.0f;
-
-		projection = glm::perspective(glm::radians(45.0f), (float)wndhdl->gWindowWidth / (float)wndhdl->gWindowHeight, 0.1f, 100.0f);
-
-		shaderProgram.use();
-
-		// Pass the matrices to the shader
-		shaderProgram.setUniform("model", model);
-		shaderProgram.setUniform("view", view);
-		shaderProgram.setUniform("projection", projection);
-
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-
-		////////////////////////////////////////////////////////////
-		glfwSwapBuffers(wndhdl->gWindow);
-
-		lastTime = currentTime;
+		Render(pWndhdl, lastTime, pTexture, cubePos, cubeAngle, pShader);
 	}
 
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
 
 	glfwTerminate();
+
+	delete pWndhdl;
+	delete pShader;
+	delete pTexture;
 
 	return 0;
 }
@@ -190,6 +134,65 @@ void Application::showFPS(GLFWwindow* window, WindowHandle wndhdl)
 	}
 
 	frameCount++;
+}
+
+void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, glm::vec3 InCubePos, float InCubeAngle, ShaderProgram* InShaderProgram)
+{
+	showFPS(InWndhdl->gWindow, *InWndhdl);
+
+	double currentTime = glfwGetTime();
+	double deltaTime = currentTime - InLastTime;
+
+	// Poll for and process events
+	glfwPollEvents();
+
+	// Clear the screen
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	pInTexture->bind(0);
+
+	glm::mat4 model(1.0), view(1.0), projection(1.0);
+
+	InCubeAngle += (float)(deltaTime * 50.0f);
+	if (InCubeAngle >= 360.0f) InCubeAngle = 0.0f;
+
+	model = glm::translate(model, InCubePos) * glm::rotate(model, glm::radians(InCubeAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	glm::vec3 camPos(0.0f, 0.0f, 0.0f);
+	glm::vec3 targetPos(0.0f, 0.0f, -1.0f);
+	glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+	view = glm::lookAt(camPos, camPos + targetPos, up);
+
+	projection = glm::perspective(glm::radians(45.0f), (float)InWndhdl->gWindowWidth / (float)InWndhdl->gWindowHeight, 0.1f, 100.0f);
+
+	InShaderProgram->use();
+
+	// Pass the matrices to the shader
+	InShaderProgram->setUniform("model", model);
+	InShaderProgram->setUniform("view", view);
+	InShaderProgram->setUniform("projection", projection);
+
+	glBindVertexArray(vao);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	//////////////////////////////////////////////////////////////////////////////////
+
+	//InShaderProgram.use();
+
+	// Pass the matrices to the shader
+	/*InShaderProgram.setUniform("model", model);
+	InShaderProgram.setUniform("view", view);
+	InShaderProgram.setUniform("projection", projection);*/
+
+	glBindVertexArray(vao);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+
+	////////////////////////////////////////////////////////////
+	glfwSwapBuffers(InWndhdl->gWindow);
+
+	InLastTime = currentTime;
 }
 
 void Application::SetupGPUBuffer(std::vector<GLfloat> vertices)

@@ -18,7 +18,6 @@ public:
 	//void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 private:
-	void Render(GLFWwindow* pInWindow, Texture* pInTexture, glm::vec3 InCubePos, float InCubeAngle, double InDeltaTime, ShaderProgram sp);
+	void Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, glm::vec3 InCubePos, float InCubeAngle, ShaderProgram* InShaderProgram);
 	void SetupGPUBuffer(std::vector<GLfloat> vertices);
 };
-
