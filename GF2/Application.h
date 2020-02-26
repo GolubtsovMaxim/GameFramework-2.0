@@ -1,8 +1,9 @@
 #include <sstream>
 
-#include "WindowHandle.h"
-#include "Texture.h"
+
 #include "ShaderProgram.h"
+#include "Texture.h"
+#include "WindowHandle.h"
 
 class Application
 {
