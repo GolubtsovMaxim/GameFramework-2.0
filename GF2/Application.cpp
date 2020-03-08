@@ -12,6 +12,8 @@
 
 bool gWireframe = false;
 const std::string texture1 = "textures/BaseTexture.jpg";
+const float MOUSE_SENSITIVITY = 0.1f;
+const float MOVE_SPEED = 5.0;
 
 Application::Application()
 {
@@ -35,6 +37,7 @@ int Application::Run()
 	}
 
 	glm::vec3 cubePos = glm::vec3(0.0f, 0.0f, -5.0f);
+	FPSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f));
 	
 	SetupGPUBuffer(pWndhdl->getVertices());
 
@@ -47,7 +50,7 @@ int Application::Run()
 	// Rendering loop
 	while (!glfwWindowShouldClose(pWndhdl->gWindow))
 	{
-		Render(pWndhdl, lastTime, pTexture, cubePos, cubeAngle, pShader);
+		Render(pWndhdl, lastTime, pTexture, fpsCamera, cubePos, cubeAngle, pShader);
 	}
 
 	glDeleteVertexArrays(1, &vao);
@@ -136,7 +139,7 @@ void Application::showFPS(GLFWwindow* window, WindowHandle wndhdl)
 	frameCount++;
 }
 
-void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, glm::vec3 InCubePos, float InCubeAngle, ShaderProgram* InShaderProgram)
+void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, FPSCamera InFpsCamera, glm::vec3 InCubePos, float InCubeAngle, ShaderProgram* InShaderProgram)
 {
 	showFPS(InWndhdl->gWindow, *InWndhdl);
 
@@ -211,4 +214,39 @@ void Application::SetupGPUBuffer(std::vector<GLfloat> vertices)
 	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
+}
+
+void Application::Update(double elapsedTime, WindowHandle* InWndhdl, FPSCamera InFpsCamera) //IMPORTANT
+{
+	// Camera orientation
+	double mouseX, mouseY;
+
+	// Get the current mouse cursor position delta
+	glfwGetCursorPos(InWndhdl->gWindow, &mouseX, &mouseY);
+
+	// Rotate the camera the difference in mouse distance from the center screen.  Multiply this delta by a speed scaler
+	InFpsCamera.rotate((float)(InWndhdl->gWindowWidth / 2.0 - mouseX) * MOUSE_SENSITIVITY, (float)(InWndhdl->gWindowHeight / 2.0 - mouseY) * MOUSE_SENSITIVITY);
+
+	// Clamp mouse cursor to center of screen
+	glfwSetCursorPos(InWndhdl->gWindow, InWndhdl->gWindowWidth / 2.0, InWndhdl->gWindowHeight / 2.0);
+
+	// Camera FPS movement
+
+	// Forward/backward
+	if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_W) == GLFW_PRESS)
+		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * InFpsCamera.getLook());
+	else if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_S) == GLFW_PRESS)
+		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * -InFpsCamera.getLook());
+
+	// Strafe left/right
+	if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_A) == GLFW_PRESS)
+		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * -InFpsCamera.getRight());
+	else if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_D) == GLFW_PRESS)
+		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * InFpsCamera.getRight());
+
+	// Up/down
+	if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_Z) == GLFW_PRESS)
+		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * InFpsCamera.getUp());
+	else if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_X) == GLFW_PRESS)
+		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * -InFpsCamera.getUp());
 }

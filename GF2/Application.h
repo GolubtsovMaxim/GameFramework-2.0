@@ -4,6 +4,7 @@
 #include "ShaderProgram.h"
 #include "Texture.h"
 #include "WindowHandle.h"
+#include "Camera.h"
 
 class Application
 {
@@ -19,6 +20,7 @@ public:
 	//void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 private:
-	void Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, glm::vec3 InCubePos, float InCubeAngle, ShaderProgram* InShaderProgram);
+	void Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, FPSCamera InFpsCamera, glm::vec3 InCubePos, float InCubeAngle, ShaderProgram* InShaderProgram);
 	void SetupGPUBuffer(std::vector<GLfloat> vertices);
+	void Update(double elapsedTime, WindowHandle* InWndhdl, FPSCamera InFpsCamera);
 };
