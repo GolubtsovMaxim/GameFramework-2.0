@@ -12,6 +12,7 @@
 
 bool gWireframe = false;
 const std::string texture1 = "textures/BaseTexture.jpg";
+const std::string texture2 = "textures/FloorTexture.jpg";
 const float MOUSE_SENSITIVITY = 0.1f;
 const float MOVE_SPEED = 5.0;
 
@@ -28,7 +29,9 @@ int Application::Run()
 {
 	WindowHandle* pWndhdl = new WindowHandle;
 	Texture* pTexture = new Texture;
+	Texture* pFloorTexture = new Texture;
 	ShaderProgram* pShader = new ShaderProgram;
+	
 
 	if (!initOpenGL(pWndhdl))
 	{
@@ -37,12 +40,14 @@ int Application::Run()
 	}
 
 	glm::vec3 cubePos = glm::vec3(0.0f, 0.0f, -5.0f);
+	glm::vec3 floorPos = glm::vec3(0.0f, -1.0f, 0.0f);
 	FPSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f));
 	
 	SetupGPUBuffer(pWndhdl->getVertices());
 
 	pShader->loadShaders("shaders/basic.vert", "shaders/basic.frag");
 	pTexture->loadTexture(texture1, true);
+	pFloorTexture->loadTexture(texture2, true);
 
 	double lastTime = glfwGetTime();
 	float cubeAngle = 0.0f;
@@ -50,7 +55,7 @@ int Application::Run()
 	// Rendering loop
 	while (!glfwWindowShouldClose(pWndhdl->gWindow))
 	{
-		Render(pWndhdl, lastTime, pTexture, fpsCamera, cubePos, cubeAngle, pShader);
+		Render(pWndhdl, lastTime, pTexture, pFloorTexture, fpsCamera, cubePos, floorPos, cubeAngle, pShader);
 	}
 
 	glDeleteVertexArrays(1, &vao);
@@ -139,7 +144,7 @@ void Application::showFPS(GLFWwindow* window, WindowHandle wndhdl)
 	frameCount++;
 }
 
-void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, FPSCamera InFpsCamera, glm::vec3 InCubePos, float InCubeAngle, ShaderProgram* InShaderProgram)
+void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, Texture* pInFloorTexture, FPSCamera InFpsCamera, glm::vec3 InCubePos,  glm::vec3 InFloorPos,float InCubeAngle, ShaderProgram* InShaderProgram)
 {
 	showFPS(InWndhdl->gWindow, *InWndhdl);
 
@@ -156,18 +161,14 @@ void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pIn
 
 	glm::mat4 model(1.0), view(1.0), projection(1.0);
 
-	InCubeAngle += (float)(deltaTime * 50.0f);
-	if (InCubeAngle >= 360.0f) InCubeAngle = 0.0f;
+	/*InCubeAngle += (float)(deltaTime * 50.0f);
+	if (InCubeAngle >= 360.0f) InCubeAngle = 0.0f;*/
 
-	model = glm::translate(model, InCubePos) * glm::rotate(model, glm::radians(InCubeAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, InCubePos)/* * glm::rotate(model, glm::radians(InCubeAngle), glm::vec3(0.0f, 1.0f, 0.0f))*/;
 
-	glm::vec3 camPos(0.0f, 0.0f, 0.0f);
-	glm::vec3 targetPos(0.0f, 0.0f, -1.0f);
-	glm::vec3 up(0.0f, 1.0f, 0.0f);
+	view = InFpsCamera.getViewMatrix();
 
-	view = glm::lookAt(camPos, camPos + targetPos, up);
-
-	projection = glm::perspective(glm::radians(45.0f), (float)InWndhdl->gWindowWidth / (float)InWndhdl->gWindowHeight, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(InFpsCamera.getFOV()), (float)InWndhdl->gWindowWidth / (float)InWndhdl->gWindowHeight, 0.1f, 100.0f);
 
 	InShaderProgram->use();
 
@@ -178,18 +179,15 @@ void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pIn
 
 	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
+	//glBindVertexArray(0);
 	//////////////////////////////////////////////////////////////////////////////////
 
-	//InShaderProgram.use();
-
-	// Pass the matrices to the shader
-	/*InShaderProgram.setUniform("model", model);
-	InShaderProgram.setUniform("view", view);
-	InShaderProgram.setUniform("projection", projection);*/
-
-	glBindVertexArray(vao);
+	pInFloorTexture->bind(0);
+	model = glm::translate(model, InFloorPos) * glm::scale(model, glm::vec3(10.0f, 0.01f, 10.0f));
+	InShaderProgram->setUniform("model", model);
+	//glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+
 	glBindVertexArray(0);
 
 	////////////////////////////////////////////////////////////
