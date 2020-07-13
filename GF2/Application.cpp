@@ -13,8 +13,8 @@
 bool gWireframe = false;
 const std::string texture1 = "textures/BaseTexture.jpg";
 const std::string texture2 = "textures/FloorTexture.jpg";
-const float MOUSE_SENSITIVITY = 0.1f;
-const float MOVE_SPEED = 0.1;
+const float MOUSE_SENSITIVITY = 0.01f;
+const float MOVE_SPEED = 0.01f;
 FPSCamera* fpsCamera = new FPSCamera(glm::vec3(0.0f, 0.0f, 5.0f));
 
 Application::Application()
@@ -157,6 +157,9 @@ void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pIn
 
 	Update(deltaTime, InWndhdl, InFpsCamera);
 
+	InCubePos = InFpsCamera->getPos();
+	InCubePos.z -= 10.f;
+
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -183,7 +186,7 @@ void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pIn
 	//////////////////////////////////////////////////////////////////////////////////
 
 	pInFloorTexture->bind(0);
-	model = glm::translate(model, InFloorPos) * glm::scale(model, glm::vec3(10.0f, 0.01f, 10.0f));
+	model = glm::translate(model, InFloorPos) * glm::scale(model, glm::vec3(50.0f, 0.01f, 50.0f));
 	InShaderProgram->setUniform("model", model);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
