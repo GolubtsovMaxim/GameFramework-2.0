@@ -14,7 +14,8 @@ bool gWireframe = false;
 const std::string texture1 = "textures/BaseTexture.jpg";
 const std::string texture2 = "textures/FloorTexture.jpg";
 const float MOUSE_SENSITIVITY = 0.1f;
-const float MOVE_SPEED = 5.0;
+const float MOVE_SPEED = 0.1;
+FPSCamera* fpsCamera = new FPSCamera(glm::vec3(0.0f, 0.0f, 5.0f));
 
 Application::Application()
 {
@@ -27,10 +28,10 @@ Application::~Application()
 
 int Application::Run()
 {
-	WindowHandle* pWndhdl = new WindowHandle;
-	Texture* pTexture = new Texture;
-	Texture* pFloorTexture = new Texture;
-	ShaderProgram* pShader = new ShaderProgram;
+	WindowHandle* pWndhdl = new WindowHandle();
+	Texture* pTexture = new Texture();
+	Texture* pFloorTexture = new Texture();
+	ShaderProgram* pShader = new ShaderProgram();
 	
 
 	if (!initOpenGL(pWndhdl))
@@ -39,9 +40,9 @@ int Application::Run()
 		return -1;
 	}
 
-	glm::vec3 cubePos = glm::vec3(0.0f, 0.0f, -5.0f);
+	glm::vec3 cubePos = glm::vec3(5.0f, 0.0f, -5.0f);
 	glm::vec3 floorPos = glm::vec3(0.0f, -1.0f, 0.0f);
-	FPSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f));
+	
 	
 	SetupGPUBuffer(pWndhdl->getVertices());
 
@@ -144,7 +145,7 @@ void Application::showFPS(GLFWwindow* window, WindowHandle wndhdl)
 	frameCount++;
 }
 
-void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, Texture* pInFloorTexture, FPSCamera InFpsCamera, glm::vec3 InCubePos,  glm::vec3 InFloorPos,float InCubeAngle, ShaderProgram* InShaderProgram)
+void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, Texture* pInFloorTexture, FPSCamera* InFpsCamera, glm::vec3 InCubePos,  glm::vec3 InFloorPos,float InCubeAngle, ShaderProgram* InShaderProgram)
 {
 	showFPS(InWndhdl->gWindow, *InWndhdl);
 
@@ -154,6 +155,8 @@ void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pIn
 	// Poll for and process events
 	glfwPollEvents();
 
+	Update(deltaTime, InWndhdl, InFpsCamera);
+
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -161,14 +164,11 @@ void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pIn
 
 	glm::mat4 model(1.0), view(1.0), projection(1.0);
 
-	/*InCubeAngle += (float)(deltaTime * 50.0f);
-	if (InCubeAngle >= 360.0f) InCubeAngle = 0.0f;*/
+	model = glm::translate(model, InCubePos);
 
-	model = glm::translate(model, InCubePos)/* * glm::rotate(model, glm::radians(InCubeAngle), glm::vec3(0.0f, 1.0f, 0.0f))*/;
+	view = InFpsCamera->getViewMatrix();
 
-	view = InFpsCamera.getViewMatrix();
-
-	projection = glm::perspective(glm::radians(InFpsCamera.getFOV()), (float)InWndhdl->gWindowWidth / (float)InWndhdl->gWindowHeight, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(InFpsCamera->getFOV()), (float)InWndhdl->gWindowWidth / (float)InWndhdl->gWindowHeight, 0.1f, 100.0f);
 
 	InShaderProgram->use();
 
@@ -179,13 +179,13 @@ void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pIn
 
 	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	//glBindVertexArray(0);
+
 	//////////////////////////////////////////////////////////////////////////////////
 
 	pInFloorTexture->bind(0);
 	model = glm::translate(model, InFloorPos) * glm::scale(model, glm::vec3(10.0f, 0.01f, 10.0f));
 	InShaderProgram->setUniform("model", model);
-	//glBindVertexArray(vao);
+
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	glBindVertexArray(0);
@@ -214,7 +214,7 @@ void Application::SetupGPUBuffer(std::vector<GLfloat> vertices)
 	glBindVertexArray(0);
 }
 
-void Application::Update(double elapsedTime, WindowHandle* InWndhdl, FPSCamera InFpsCamera) //IMPORTANT
+void Application::Update(double elapsedTime, WindowHandle* InWndhdl, FPSCamera* InFpsCamera) //IMPORTANT
 {
 	// Camera orientation
 	double mouseX, mouseY;
@@ -223,7 +223,7 @@ void Application::Update(double elapsedTime, WindowHandle* InWndhdl, FPSCamera I
 	glfwGetCursorPos(InWndhdl->gWindow, &mouseX, &mouseY);
 
 	// Rotate the camera the difference in mouse distance from the center screen.  Multiply this delta by a speed scaler
-	InFpsCamera.rotate((float)(InWndhdl->gWindowWidth / 2.0 - mouseX) * MOUSE_SENSITIVITY, (float)(InWndhdl->gWindowHeight / 2.0 - mouseY) * MOUSE_SENSITIVITY);
+	InFpsCamera->rotate((float)(InWndhdl->gWindowWidth / 2.0 - mouseX) * MOUSE_SENSITIVITY, (float)(InWndhdl->gWindowHeight / 2.0 - mouseY) * MOUSE_SENSITIVITY);
 
 	// Clamp mouse cursor to center of screen
 	glfwSetCursorPos(InWndhdl->gWindow, InWndhdl->gWindowWidth / 2.0, InWndhdl->gWindowHeight / 2.0);
@@ -232,19 +232,19 @@ void Application::Update(double elapsedTime, WindowHandle* InWndhdl, FPSCamera I
 
 	// Forward/backward
 	if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_W) == GLFW_PRESS)
-		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * InFpsCamera.getLook());
+		InFpsCamera->move(MOVE_SPEED * (float)elapsedTime * InFpsCamera->getLook());
 	else if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_S) == GLFW_PRESS)
-		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * -InFpsCamera.getLook());
+		InFpsCamera->move(MOVE_SPEED * (float)elapsedTime * - InFpsCamera->getLook());
 
 	// Strafe left/right
 	if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_A) == GLFW_PRESS)
-		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * -InFpsCamera.getRight());
+		InFpsCamera->move(MOVE_SPEED * (float)elapsedTime * - InFpsCamera->getRight());
 	else if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_D) == GLFW_PRESS)
-		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * InFpsCamera.getRight());
+		InFpsCamera->move(MOVE_SPEED * (float)elapsedTime * InFpsCamera->getRight());
 
 	// Up/down
 	if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_Z) == GLFW_PRESS)
-		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * InFpsCamera.getUp());
+		InFpsCamera->move(MOVE_SPEED * (float)elapsedTime * InFpsCamera->getUp());
 	else if (glfwGetKey(InWndhdl->gWindow, GLFW_KEY_X) == GLFW_PRESS)
-		InFpsCamera.move(MOVE_SPEED * (float)elapsedTime * -InFpsCamera.getUp());
+		InFpsCamera->move(MOVE_SPEED * (float)elapsedTime * -InFpsCamera->getUp());
 }

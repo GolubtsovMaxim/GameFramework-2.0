@@ -20,7 +20,7 @@ public:
 	//void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 private:
-	void Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, Texture* pInFloorTexture, FPSCamera InFpsCamera, glm::vec3 InCubePos, glm::vec3 InFloorPos, float InCubeAngle, ShaderProgram* InShaderProgram);
+	void Render(WindowHandle* InWndhdl, double InLastTime, Texture* pInTexture, Texture* pInFloorTexture, FPSCamera* InFpsCamera, glm::vec3 InCubePos, glm::vec3 InFloorPos, float InCubeAngle, ShaderProgram* InShaderProgram);
 	void SetupGPUBuffer(std::vector<GLfloat> vertices);
-	void Update(double elapsedTime, WindowHandle* InWndhdl, FPSCamera InFpsCamera);
+	void Update(double elapsedTime, WindowHandle* InWndhdl, FPSCamera* InFpsCamera);
 };
