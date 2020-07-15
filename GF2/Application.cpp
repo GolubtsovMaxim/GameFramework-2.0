@@ -13,8 +13,8 @@
 bool gWireframe = false;
 const std::string texture1 = "textures/BaseTexture.jpg";
 const std::string texture2 = "textures/FloorTexture.jpg";
-const float MOUSE_SENSITIVITY = 0.01f;
-const float MOVE_SPEED = 0.01f;
+constexpr float MOUSE_SENSITIVITY{ 0.01f };
+constexpr float MOVE_SPEED{ 0.01f };
 FPSCamera* fpsCamera = new FPSCamera(glm::vec3(0.0f, 0.0f, 5.0f));
 
 Application::Application()
