@@ -118,9 +118,9 @@ bool Application::initOpenGL(WindowHandle* wndhdl)
 
 void Application::showFPS(GLFWwindow* window, WindowHandle wndhdl)
 {
-	static double previousSeconds = 0.0;
-	static int frameCount = 0;
-	double elapsedSeconds;
+	static double previousSeconds{};
+	static unsigned frameCount{};
+	double elapsedSeconds{};
 	double currentSeconds = glfwGetTime();
 
 	elapsedSeconds = currentSeconds - previousSeconds;
