@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -28,13 +29,16 @@ Application::~Application()
 
 int Application::Run()
 {
-	WindowHandle* pWndhdl = new WindowHandle();
-	Texture* pTexture = new Texture();
-	Texture* pFloorTexture = new Texture();
-	ShaderProgram* pShader = new ShaderProgram();
-	
+	//WindowHandle* pWndhdl = new WindowHandle();
+	std::unique_ptr<WindowHandle> pWndhdl(new WindowHandle);
+	//Texture* pTexture = new Texture();
+	std::unique_ptr<Texture> pTexture(new Texture);
+	//Texture* pFloorTexture = new Texture();
+	std::unique_ptr<Texture> pFloorTexture(new Texture);
+	//ShaderProgram* pShader = new ShaderProgram();
+	std::unique_ptr<ShaderProgram> pShader(new ShaderProgram);
 
-	if (!initOpenGL(pWndhdl))
+	if (!initOpenGL(pWndhdl.get()))
 	{
 		std::cerr << "GLFW initialization failed" << std::endl;
 		return -1;
@@ -42,7 +46,6 @@ int Application::Run()
 
 	glm::vec3 cubePos = glm::vec3(5.0f, 0.0f, -5.0f);
 	glm::vec3 floorPos = glm::vec3(0.0f, -1.0f, 0.0f);
-	
 	
 	SetupGPUBuffer(pWndhdl->getVertices());
 
@@ -56,17 +59,13 @@ int Application::Run()
 	// Rendering loop
 	while (!glfwWindowShouldClose(pWndhdl->gWindow))
 	{
-		Render(pWndhdl, lastTime, pTexture, pFloorTexture, fpsCamera, cubePos, floorPos, cubeAngle, pShader);
+		Render(pWndhdl.get(), lastTime, pTexture.get(), pFloorTexture.get(), fpsCamera, cubePos, floorPos, cubeAngle, pShader.get());
 	}
 
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
 
 	glfwTerminate();
-
-	delete pWndhdl;
-	delete pShader;
-	delete pTexture;
 
 	return 0;
 }
