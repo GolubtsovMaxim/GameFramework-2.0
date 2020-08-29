@@ -54,7 +54,7 @@ int Application::Run()
 	pFloorTexture->loadTexture(texture2, true);
 
 	double lastTime = glfwGetTime();
-	float cubeAngle = 0.0f;
+	constexpr float cubeAngle = 0.0f;
 
 	// Rendering loop
 	while (!glfwWindowShouldClose(pWndhdl->gWindow))
@@ -170,7 +170,7 @@ void Application::Render(WindowHandle* InWndhdl, double InLastTime, Texture* pIn
 
 	view = InFpsCamera->getViewMatrix();
 
-	projection = glm::perspective(glm::radians(InFpsCamera->getFOV()), (float)InWndhdl->gWindowWidth / (float)InWndhdl->gWindowHeight, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(InFpsCamera->getFOV()), static_cast<float>(InWndhdl->gWindowWidth) / static_cast<float>(InWndhdl->gWindowHeight), 0.1f, 100.0f);
 
 	InShaderProgram->use();
 
